@@ -303,44 +303,75 @@ nav ul li a:hover { color: var(--primary); }
 </section>
 
 <script>
-// Carrousel automatique + swipe
+// Carousel auto + touch drag (robust)
 const track = document.querySelector('.carousel-track');
 const container = document.querySelector('.carousel-container');
-let pos = 0;
+if(track && container){
+  let translate = 0; // pixels scrolled to the left
+  let prevTranslate = 0;
+  let isDragging = false;
+  let startX = 0;
+  const speed = 0.6; // auto speed (px per frame)
 
-function autoSlide(){
-  pos += 1;
-  track.style.transform = `translateX(-${pos}px)`;
-  if(pos >= track.scrollWidth / 2){ pos = 0; }
-  requestAnimationFrame(autoSlide);
+  // apply transform helper
+  function setTransform(){
+    track.style.transform = `translateX(${-translate}px)`;
+  }
+
+  // Auto loop using requestAnimationFrame
+  function autoStep(){
+    if(!isDragging){
+      translate += speed;
+      // wrap when half of track (we duplicate items), reset to 0
+      if(translate >= track.scrollWidth / 2){
+        translate = 0;
+        prevTranslate = 0;
+      }
+      setTransform();
+    }
+    requestAnimationFrame(autoStep);
+  }
+  requestAnimationFrame(autoStep);
+
+  // Pointer / touch handlers
+  function pointerDown(x){
+    isDragging = true;
+    startX = x;
+    // freeze auto by recording prevTranslate
+    prevTranslate = translate;
+    track.style.transition = 'none';
+  }
+  function pointerMove(x){
+    if(!isDragging) return;
+    const delta = x - startX;
+    // move opposite to pointer (drag left -> positive translate)
+    translate = prevTranslate - delta;
+    // clamp between 0 and half width
+    if(translate < 0) translate = 0;
+    if(translate > track.scrollWidth / 2) translate = track.scrollWidth / 2;
+    setTransform();
+  }
+  function pointerUp(){
+    isDragging = false;
+    prevTranslate = translate;
+    // allow small snap back
+    track.style.transition = '';
+  }
+
+  // Mouse
+  container.addEventListener('mousedown', (e)=>{ e.preventDefault(); pointerDown(e.clientX); });
+  window.addEventListener('mousemove', (e)=>{ pointerMove(e.clientX); });
+  window.addEventListener('mouseup', ()=>{ pointerUp(); });
+
+  // Touch
+  container.addEventListener('touchstart', (e)=>{ pointerDown(e.touches[0].clientX); });
+  container.addEventListener('touchmove', (e)=>{ e.preventDefault(); pointerMove(e.touches[0].clientX); }, {passive:false});
+  container.addEventListener('touchend', ()=>{ pointerUp(); });
+
+  // Make container scrollable by keyboard / accessibility and hide native scrollbar
+  container.style.overflow = 'hidden';
+  container.style.touchAction = 'none';
 }
-autoSlide();
-
-// Swipe
-let isDown=false, startX, scrollLeft;
-container.addEventListener('mousedown',(e)=>{
- isDown=true;
- startX=e.pageX;
- track.style.transition='none';
-});
-container.addEventListener('mouseup',()=>{ isDown=false; track.style.transition=''; });
-container.addEventListener('mousemove',(e)=>{
- if(!isDown) return;
- const walk=(e.pageX-startX)*-1;
- track.style.transform=`translateX(${walk-pos}px)`;
-});
-// Touch
-container.addEventListener('touchstart',(e)=>{
- isDown=true;
- startX=e.touches[0].pageX;
- track.style.transition='none';
-});
-container.addEventListener('touchend',()=>{ isDown=false; track.style.transition=''; });
-container.addEventListener('touchmove',(e)=>{
- if(!isDown) return;
- const walk=(e.touches[0].pageX-startX)*-1;
- track.style.transform=`translateX(${walk-pos}px)`;
-});
 </script>
 </body>
 </html>
