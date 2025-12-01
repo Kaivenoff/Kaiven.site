@@ -192,12 +192,26 @@ nav ul li a:hover { color: var(--primary); }
 .contact a:hover { text-decoration: underline; }
 
 @media(max-width: 768px){
-  .carousel-item { width: 160px; height: 220px; }
+  nav ul { gap: 20px; }
+  nav ul li a { font-size: 1rem; }
+
+  .hero { padding: 140px 15px 70px; text-align: center; }
+  .hero h1 { font-size: 2rem; }
+  .hero p { font-size: 0.9rem; }
+
+  .carousel-item { width: 120px; height: 170px; }
+
+  .sponsor-box { width: 130px; height: 70px; }
+  .setup-box { width: 100%; height: auto; padding: 15px; text-align: center; }
+
+  .social-container { flex-direction: column; gap: 15px; align-items: center; }
+  .social-item { width: 90%; justify-content: center; }
+}
   .hero h1 { font-size: 2.4rem; }
   .hero p { font-size: 1rem; }
   .setup-box { width: 140px; height: 100px; font-size: 0.9rem; }
   .sponsor-box { width: 140px; height: 80px; font-size: 0.9rem; }
-}
+
 </style>
 </head>
 <body>
@@ -222,23 +236,23 @@ nav ul li a:hover { color: var(--primary); }
     <span style="font-weight:600; margin-right:10px;">Retrouvez-moi :</span>
 
     <div class="social-item">
-      <img src="images/twitch-logo-twitch-icon-transparent-free-png.png">
-      <a href="https://www.twitch.tv/kaiven_off" target="_blank">Kaiven_off</a>
+      <img src="images/tiktok.png">
+      <a href="#" target="_blank">@Kaiven</a>
     </div>
 
     <div class="social-item">
-      <img src="images/tiktok-logo-tikok-icon-transparent-tikok-app-logo-free-png.png">
-      <a href="#" target="_blank">Kaiven</a>
+      <img src="images/twitch.png">
+      <a href="#" target="_blank">KaivenTV</a>
     </div>
 
     <div class="social-item">
-      <img src="images/youtube-logo-youtube-icon-transparent-free-png.webp">
-      <a href="https://www.youtube.com/@Kaiven_0612" target="_blank">@Kaiven_0612</a>
+      <img src="images/youtube.png">
+      <a href="#" target="_blank">Kaiven YT</a>
     </div>
 
     <div class="social-item">
-      <img src="images/Instagram_icon.png">
-      <a href="https://www.instagram.com/its_kaiven_/" target="_blank">its_kaiven_</a>
+      <img src="images/instagram.png">
+      <a href="#" target="_blank">@Kaiven_IG</a>
     </div>
   </div>
 </section>
@@ -287,5 +301,42 @@ nav ul li a:hover { color: var(--primary); }
   <p>Pour partenariats ou collaborations, n'hésitez pas !</p>
 </section>
 
+<script>
+// Carousel swipe + auto-scroll
+const track = document.querySelector('.carousel-track');
+let isDown = false;
+let startX;
+let scrollLeft;
+
+track.addEventListener('mousedown', (e) => {
+  isDown = true;
+  track.classList.add('active');
+  startX = e.pageX - track.offsetLeft;
+  scrollLeft = track.scrollLeft;
+});
+track.addEventListener('mouseleave', () => { isDown = false; });
+track.addEventListener('mouseup', () => { isDown = false; });
+track.addEventListener('mousemove', (e) => {
+  if(!isDown) return;
+  e.preventDefault();
+  const x = e.pageX - track.offsetLeft;
+  const walk = (x - startX) * 2;
+  track.scrollLeft = scrollLeft - walk;
+});
+
+// Touch mobile
+track.addEventListener('touchstart', (e) => {
+  isDown = true;
+  startX = e.touches[0].pageX - track.offsetLeft;
+  scrollLeft = track.scrollLeft;
+});
+track.addEventListener('touchend', () => { isDown = false; });
+track.addEventListener('touchmove', (e) => {
+  if(!isDown) return;
+  const x = e.touches[0].pageX - track.offsetLeft;
+  const walk = (x - startX) * 2;
+  track.scrollLeft = scrollLeft - walk;
+});
+</script>
 </body>
 </html>
